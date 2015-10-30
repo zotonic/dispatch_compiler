@@ -97,12 +97,12 @@
     binding/0
 ]).
 
--spec compile_load(atom(), list(dispatch_rule())) -> {ok, atom()}.
+-spec compile_load(atom(), list(dispatch_rule())) -> ok.
 compile_load(ModuleName, DLs) ->
     {ok, Module, Bin} = compile(ModuleName, DLs),
     code:purge(Module),
     {module, _} = code:load_binary(Module, atom_to_list(ModuleName) ++ ".erl", Bin),
-    {ok, ModuleName}.
+    ok.
 
 
 -spec compile(atom(), list(dispatch_rule())) -> {ok, atom(), binary()}.
@@ -419,7 +419,7 @@ bind([{Token, {Module,Function}}|RestToken],[Match|RestMatch],Bindings, Context)
     end;
 bind([{Token, {Module,Function,Args}}|RestToken],[Match|RestMatch],Bindings, Context) 
   when is_atom(Token), is_atom(Module), is_atom(Function), is_list(Args) ->
-    case Module:Function(Match, [Context|Args]) of
+    case erlang:apply(Module, Function, [Match,Context|Args]) of
         true -> bind(RestToken, RestMatch, [{Token, Match}|Bindings], Context);
         false -> fail;
         {ok, Value} -> bind(RestToken, RestMatch, [{Token, Value}|Bindings], Context)
