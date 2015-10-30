@@ -1,0 +1,11 @@
+{application, dispatch_compiler,
+ [
+  {description, "Compile dispatch rules to an Erlang module"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {env, []}
+ ]}.
