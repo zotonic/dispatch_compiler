@@ -51,9 +51,9 @@ Now the compiled module can be used to match (the _undefined_ will be passed as 
     {ok, { {test, ["a", v], foo, []}, [{v,<<"b">>}]}}
 
 The return value contains the matched dispatch rule and any bound variables.
-If more than one dispatch rule matches, then the first matching rule will be returned.
+The first matching rule is returned.
 
-Another example:
+Another example showing a matching wildcard:
 
     2> mydispatch:match([<<"w">>, <<"b">>, <<"c">>], undefined).
     {ok, { {wildcard, ["w", '*'], foo, []}, [{'*',[<<"b">>, <<"c">>]}]}}
