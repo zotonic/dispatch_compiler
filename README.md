@@ -1,4 +1,5 @@
-# dispatch_compiler
+# dispatch_compiler [![Build Status](https://secure.travis-ci.org/zotonic/dispatch_compiler.png?branch=master)](http://travis-ci.org/zotonic/dispatch_compiler)
+
 Compiles dispatch rules to an Erlang module for quick matching.
 
 The dispatch compiler takes a list of dispatch rules and creates
