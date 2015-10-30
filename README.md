@@ -1,7 +1,7 @@
 # dispatch_compiler
-Compiles dispatch rules to an Erlang module for quick dispatch matching.
+Compiles dispatch rules to an Erlang module for quick matching.
 
-The dispatch compiler takes all the list of dispatch rules and creates
+The dispatch compiler takes a list of dispatch rules and creates
 an Erlang module that matches those rules.
 
 The compiled Erlang module exports a single function: `match/2`.
