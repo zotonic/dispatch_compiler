@@ -4,13 +4,13 @@ Compiles dispatch rules to an Erlang module for quick dispatch matching.
 The dispatch compiler takes all the list of dispatch rules and creates
 an Erlang module that matches those rules.
 
-The Erlang module exports a single function: `match/2`.
+The compiled Erlang module exports a single function: `match/2`.
 
 ## Dispatch rules
 
 Dispatch rules are lists of tokens with some extra information:
 
-    {name, ["foo", "bar", id], controller_name, [list,controller,options]}
+    {name, ["foo", "bar", id], controller_name, [controller,options]}
 
 The path parts can be one of the following:
 
@@ -47,25 +47,23 @@ First compile the dispatch rules to an Erlang module:
     
 Now the compiled module can be used to match (the _undefined_ will be passed as `Context` to any functions in the dispatch rules):
 
-    mydispatch:match([<<"a">>, <<"b">>], undefined).
-
-This returns the matched dispatch rule and any bound variables:
-
+    1> mydispatch:match([<<"a">>, <<"b">>], undefined).
     {ok, { {test, ["a", v], foo, []}, [{v,<<"b">>}]}}
 
-Or:
+The return value contains the matched dispatch rule and any bound variables.
+If more than one dispatch rule matches, then the first matching rule will be returned.
 
-    mydispatch:match([<<"w">>, <<"b">>, <<"c">>], undefined).
+Another example:
 
-Returns:
-
+    2> mydispatch:match([<<"w">>, <<"b">>, <<"c">>], undefined).
     {ok, { {wildcard, ["w", '*'], foo, []}, [{'*',[<<"b">>, <<"c">>]}]}}
 
-If no dispatch rule could be match then `fail` is returned:
+If no dispatch rule could be matched, then `fail` is returned:
 
-    mydispatch:match([<<"a">>, <<"b">>, <<"c">>], undefined).
-
-Returns:
-
+    3> mydispatch:match([<<"a">>, <<"b">>, <<"c">>], undefined).
     fail
+
+## Tests
+
+Run `make test` to run the tests.
 
