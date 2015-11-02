@@ -25,11 +25,11 @@
 %% '''
 %%
 %% Rules can also have conditions on their arguments. The condition are matched
-%% using the runtime z_dispatch_compiler:bind/3 function.
+%% using the runtime dispatch_compiler:bind/3 function.
 %%
 %% ```
 %% match([&lt;&lt;"id">>, Foo] = Path, Context) ->
-%%      case z_dispatch_compiler:runtime_bind(Path, ["id", id], Context) of
+%%      case dispatch_compiler:runtime_bind(Path, ["id", id], Context) of
 %%          {ok, Bindings} ->
 %%              {ok, {{id, ["id", id], controller_id, [...]}, Bindings}};
 %%          fail ->
@@ -379,10 +379,10 @@ is_match(_, []) ->
     false;
 is_match([B|Pattern0], [B|Pattern1]) ->
     is_match(Pattern0, Pattern1);
-is_match(['*'|_], _) ->
-    false;
-is_match(_, ['*'|_]) ->
-    false;
+is_match(['*'], _) ->
+    true;
+is_match(_, ['*']) ->
+    true;
 is_match([B0|_], [B1|_]) when is_binary(B0), is_binary(B1) ->
     false;
 is_match([B0|_], [B1|_]) when is_list(B0), is_list(B1) ->

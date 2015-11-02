@@ -76,6 +76,34 @@ re_test() ->
                  ?M:match([<<"id">>, <<"bar">>], none)).
 
 
+re2_test() ->
+    Rules = [
+        {nr, ["id", {v, "^[0-9]+$"}], x, []},
+        {foo, ["foo", bar], x, []}
+    ],
+    ok = dispatch_compiler:compile_load(?M, Rules),
+    ?assertEqual({ok, {{nr, ["id", {v, "^[0-9]+$"}], x, []}, [{v, <<"1234">>}]}},
+                 ?M:match([<<"id">>, <<"1234">>], none)),
+
+    ?assertEqual({ok, {{foo, ["foo", bar], x, []}, [{bar, <<"bar">>}]}},
+                 ?M:match([<<"foo">>, <<"bar">>], none)),
+
+    ?assertEqual(fail,
+                 ?M:match([<<"id">>, <<"bar">>], none)).
+
+
+re3_test() ->
+    Rules = [
+        {nr, ["id", {v, "^[0-9]+$"}], x, []},
+        {nr, ["id", '*'], x, []}
+    ],
+    ok = dispatch_compiler:compile_load(?M, Rules),
+    ?assertEqual({ok, {{nr, ["id", {v, "^[0-9]+$"}], x, []}, [{v, <<"1234">>}]}},
+                 ?M:match([<<"id">>, <<"1234">>], none)),
+
+    ?assertEqual({ok, {{nr, ["id", '*'], x, []}, [{'*', [<<"bar">>]}]}},
+                 ?M:match([<<"id">>, <<"bar">>], none)).
+
 mf_test() ->
     Rules = [
         {a, ["id", {foo, {?MODULE, is_foo}}], x, []},
