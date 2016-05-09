@@ -51,7 +51,7 @@ wildcard_test() ->
     ?assertEqual({ok, {{image, ["image", '*'], x, []}, [{'*', [<<"foo">>, <<"bar">>]}]}},
                  ?M:match([<<"image">>, <<"foo">>, <<"bar">>], none)),
 
-    ?assertEqual(fail,
+    ?assertEqual({ok, {{image, ["image", '*'], x, []}, [{'*', []}]}},
                  ?M:match([<<"image">>], none)).
 
 wildcard2_test() ->
@@ -60,7 +60,10 @@ wildcard2_test() ->
     ],
     ok = dispatch_compiler:compile_load(?M, Rules),
     ?assertEqual({ok, {{all, ['*'], x, []}, [{'*', [<<"image">>, <<"foo">>, <<"bar">>]}]}},
-                 ?M:match([<<"image">>, <<"foo">>, <<"bar">>], none)).
+                 ?M:match([<<"image">>, <<"foo">>, <<"bar">>], none)),
+
+    ?assertEqual({ok, {{all, ['*'], x, []}, [{'*', []}]}},
+                 ?M:match([], none)).
 
 
 re_test() ->

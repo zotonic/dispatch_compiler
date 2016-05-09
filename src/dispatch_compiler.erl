@@ -270,21 +270,17 @@ list_pattern([B|Ps], Nr, Acc) when is_list(B) ->
     P = erl_syntax:abstract(unicode:characters_to_binary(B)),
     list_pattern(Ps, Nr+1, [P|Acc]);
 list_pattern(['*'], Nr, []) ->
-    %  [_|_] = V3 = Path
+    %  _ = V3 = Path
     Var = erl_syntax:match_expr(
-            erl_syntax:list(
-                [erl_syntax:variable("_")],
-                erl_syntax:variable("_")),
+            erl_syntax:variable("_"),
             var(Nr)),
     erl_syntax:match_expr(
         Var,
         erl_syntax:variable("Path"));
 list_pattern(['*'], Nr, Acc) ->
-    %  [ <<"foo">>, <<"bar">> | [_|_] = V3 ] = Path
+    %  [ <<"foo">>, <<"bar">> | V3 ] = Path
     Var = erl_syntax:match_expr(
-            erl_syntax:list(
-                [erl_syntax:variable("_")],
-                erl_syntax:variable("_")),
+            erl_syntax:variable("_"),
             var(Nr)),
     erl_syntax:match_expr(
         erl_syntax:list(
@@ -373,16 +369,16 @@ is_matching_other(Pattern0, [{_Name, Pattern1, _Controller, _Options}|DLs]) ->
 
 is_match([], []) -> 
     true;
+is_match(['*'], _) ->
+    true;
+is_match(_, ['*']) ->
+    true;
 is_match([], _) -> 
     false;
 is_match(_, []) -> 
     false;
 is_match([B|Pattern0], [B|Pattern1]) ->
     is_match(Pattern0, Pattern1);
-is_match(['*'], _) ->
-    true;
-is_match(_, ['*']) ->
-    true;
 is_match([B0|_], [B1|_]) when is_binary(B0), is_binary(B1) ->
     false;
 is_match([B0|_], [B1|_]) when is_list(B0), is_list(B1) ->
