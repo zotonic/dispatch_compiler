@@ -17,7 +17,7 @@ The path parts can be one of the following:
 
  * a string `"foo"`. This is translated to a _binary_ and must match literally
  * an atom `id` this binds the variable to the token and is returned
- * the atom `'*'`, this binds to any left tokens, though never to the empty list of tokens
+ * the atom `'*'`, this binds to any left tokens, which could be an empty list
  * regular expressions `{id, "^[0-9]+$"}`
  * regular expressions with _re_ compile options `{id, "^[a-z]+$", [caseless]}`
 
