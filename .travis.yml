@@ -1,9 +1,6 @@
 language: erlang
 otp_release:
   - 19.3
-branches:
-  only:
-    - master
 jobs:
   include:
     - stage: deploy
@@ -16,6 +13,7 @@ jobs:
         on:
           tags: true
           all_branches: true
+
 install:
   - wget https://s3.amazonaws.com/rebar3/rebar3 && chmod +x rebar3
 script: make test
