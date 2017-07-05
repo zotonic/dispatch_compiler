@@ -19,17 +19,10 @@ jobs:
 install:
   - wget https://s3.amazonaws.com/rebar3/rebar3 && chmod +x rebar3
 script: make test
+sudo: false
 notifications:
   email:
     recipients:
       - zotonic-commits@googlegroups.com
     on_success: change #[always|never|change] # default: change
     on_failure: always #[always|never|change] # default: always
-  irc:
-    channels:
-      - "chat.freenode.net#zotonic"
-    on_success: change #[always|never|change] # default: change
-    on_failure: always #[always|never|change] # default: always
-    template:
-      - "New commit on %{repository_name}/%{branch} by %{author}:  %{message} (%{commit}) "
-      - "Build details: %{build_url}"
