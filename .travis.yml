@@ -1,6 +1,6 @@
 language: erlang
 otp_release:
-  - 18.0
+  - 20.0
   - 19.3
 jobs:
   include:
