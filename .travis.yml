@@ -1,5 +1,6 @@
 language: erlang
 otp_release:
+  - 18.0
   - 19.3
 jobs:
   include:
@@ -16,7 +17,7 @@ jobs:
 
 install:
   - wget https://s3.amazonaws.com/rebar3/rebar3 && chmod +x rebar3
-script: make test
+script: make clean test
 sudo: false
 notifications:
   email:
