@@ -19,6 +19,7 @@ install:
 script:
   - make test
   - make xref
+  - make dialyzer
 sudo: false
 notifications:
   email:
