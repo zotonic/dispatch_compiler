@@ -1,14 +1,48 @@
--module(dispatch_compiler_tests).
+-module(dispatch_compiler_basic_SUITE).
 
+-include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
+
+-compile(export_all).
+
+
+suite() ->
+    [
+        {timetrap, {seconds, 30}}
+    ].
+
+all() ->
+    [
+        {group, basic}
+    ].
+
+groups() ->
+    [{basic, [],
+        [simple_test
+        ,wildcard_test
+        ,wildcard2_test
+        ,re_test
+        ,re2_test
+        ,re3_test
+        ,mf_test
+        ]}].
+
+init_per_suite(Config) ->
+    {ok, _} = application:ensure_all_started(dispatch_compiler),
+    Config.
+
+end_per_suite(_Config) ->
+    ok.
+
+init_per_group(basic, Config) ->
+    Config.
+
+end_per_group(basic, _Config) ->
+    ok.
 
 -define(M, '-dispatch-test-').
 
--export([
-    is_foo/2
-]).
-
-simple_test() ->
+simple_test(_Config) ->
     Rules = [
         {home, [], x, []},
         {a, ["a"], x, []},
@@ -43,7 +77,7 @@ simple_test() ->
     ?assertEqual(fail,
                  ?M:match([<<"c">>], none)).
 
-wildcard_test() ->
+wildcard_test(_Config) ->
     Rules = [
         {image, ["image", '*'], x, []}
     ],
@@ -54,7 +88,7 @@ wildcard_test() ->
     ?assertEqual({ok, {{image, ["image", '*'], x, []}, [{'*', []}]}},
                  ?M:match([<<"image">>], none)).
 
-wildcard2_test() ->
+wildcard2_test(_Config) ->
     Rules = [
         {all, ['*'], x, []}
     ],
@@ -66,7 +100,7 @@ wildcard2_test() ->
                  ?M:match([], none)).
 
 
-re_test() ->
+re_test(_Config) ->
     Rules = [
         {nr, ["id", {v, "^[0-9]+$"}], x, []},
         {nr, ["id", foo], x, []}
@@ -79,7 +113,7 @@ re_test() ->
                  ?M:match([<<"id">>, <<"bar">>], none)).
 
 
-re2_test() ->
+re2_test(_Config) ->
     Rules = [
         {nr, ["id", {v, "^[0-9]+$"}], x, []},
         {foo, ["foo", bar], x, []}
@@ -95,7 +129,7 @@ re2_test() ->
                  ?M:match([<<"id">>, <<"bar">>], none)).
 
 
-re3_test() ->
+re3_test(_Config) ->
     Rules = [
         {nr, ["id", {v, "^[0-9]+$"}], x, []},
         {nr, ["id", '*'], x, []}
@@ -107,7 +141,7 @@ re3_test() ->
     ?assertEqual({ok, {{nr, ["id", '*'], x, []}, [{'*', [<<"bar">>]}]}},
                  ?M:match([<<"id">>, <<"bar">>], none)).
 
-mf_test() ->
+mf_test(_Config) ->
     Rules = [
         {a, ["id", {foo, {?MODULE, is_foo}}], x, []},
         {b, ["id", "foo"], x, []},
