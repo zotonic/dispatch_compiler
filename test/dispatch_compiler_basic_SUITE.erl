@@ -3,8 +3,10 @@
 -include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
 
--compile(export_all).
-
+-export([suite/0, all/0, groups/0, init_per_suite/1,
+	end_per_suite/1, init_per_group/2, end_per_group/2,
+	simple_test/1, wildcard_test/1,	wildcard2_test/1,
+	re_test/1, re2_test/1, re3_test/1, mf_test/1, is_foo/2]).
 
 suite() ->
     [

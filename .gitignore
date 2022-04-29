@@ -11,3 +11,6 @@ rel/example_project
 .rebar3
 _build/
 rebar3
+doc/*
+!doc/style.css
+!doc/overview.edoc
