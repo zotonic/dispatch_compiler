@@ -36,6 +36,7 @@ xref: $(REBAR)
 
 test: $(REBAR)
 	$(REBAR) $(REBAR_OPTS) ct
+	$(REBAR) proper -n 1
 
 
 # Cleaning
