@@ -36,6 +36,7 @@ xref: $(REBAR)
 
 test: $(REBAR)
 	$(REBAR) $(REBAR_OPTS) ct
+	$(REBAR) proper -n 1
 
 
 # Cleaning
@@ -55,3 +56,12 @@ clean: clean_logs $(REBAR)
 dist-clean: clean
 	$(REBAR) $(REBAR_OPTS) clean -a
 	rm -f ./rebar3
+
+##
+## Doc targets
+##
+docs: $(REBAR)
+	$(REBAR) edoc
+
+edoc_private: $(REBAR)	
+	$(REBAR) as edoc_private edoc
