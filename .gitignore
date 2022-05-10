@@ -14,3 +14,4 @@ rebar3
 doc/*
 !doc/style.css
 !doc/overview.edoc
+!doc/img/logo.png

@@ -1,4 +1,5 @@
 ![Test](https://github.com/zotonic/dispatch_compiler/workflows/Test/badge.svg)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?logo=apache&logoColor=red)](https://www.apache.org/licenses/LICENSE-2.0)
 
 # dispatch_compiler
 
