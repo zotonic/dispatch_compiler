@@ -79,7 +79,7 @@ Run `make test` to run the tests.
 `rebar3 edoc`
 
 #### Generate private API
-`rebar3 edoc`
+`rebar3 as edoc_private edoc`
 
 ### ExDoc
 `rebar3 ex_doc --logo doc/img/logo.png --output edoc`
