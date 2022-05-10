@@ -71,3 +71,15 @@ If no dispatch rule could be matched, then `fail` is returned:
 
 Run `make test` to run the tests.
 
+## Documentation generation
+
+### Edoc
+
+#### Generate public API
+`rebar3 edoc`
+
+#### Generate private API
+`rebar3 edoc`
+
+### ExDoc
+`rebar3 ex_doc --logo doc/img/logo.png --output edoc`
