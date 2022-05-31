@@ -11,6 +11,10 @@ rel/example_project
 .rebar3
 _build/
 rebar3
+edoc
 doc/*
 !doc/style.css
 !doc/overview.edoc
+!doc/img
+!doc/img/*
+!doc/img/logo.png

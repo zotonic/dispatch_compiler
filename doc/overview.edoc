@@ -2,4 +2,3 @@
 @title dispatch_compiler
 @doc Compiles dispatch rules to an Erlang module for quick matching.
 @copyright Apache 2.0
-

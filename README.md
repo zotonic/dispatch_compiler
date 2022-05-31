@@ -1,4 +1,5 @@
 ![Test](https://github.com/zotonic/dispatch_compiler/workflows/Test/badge.svg)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?logo=apache&logoColor=red)](https://www.apache.org/licenses/LICENSE-2.0)
 
 # dispatch_compiler
 
@@ -70,3 +71,15 @@ If no dispatch rule could be matched, then `fail` is returned:
 
 Run `make test` to run the tests.
 
+## Documentation generation
+
+### Edoc
+
+#### Generate public API
+`rebar3 edoc`
+
+#### Generate private API
+`rebar3 as edoc_private edoc`
+
+### ExDoc
+`rebar3 ex_doc --logo doc/img/logo.png --output edoc`

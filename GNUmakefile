@@ -36,7 +36,7 @@ xref: $(REBAR)
 
 test: $(REBAR)
 	$(REBAR) $(REBAR_OPTS) ct
-	$(REBAR) proper -n 1
+	$(REBAR) as test proper -n 1
 
 
 # Cleaning
@@ -65,3 +65,6 @@ docs: $(REBAR)
 
 edoc_private: $(REBAR)	
 	$(REBAR) as edoc_private edoc
+
+exdoc: $(REBAR)	
+	$(REBAR) ex_doc --logo doc/img/logo.png --output edoc
