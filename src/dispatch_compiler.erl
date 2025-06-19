@@ -82,12 +82,37 @@
             | {atom(), {atom(), atom(), list()}}
             | {atom(), match_function()}
             | {atom(), RegExp::iodata() | unicode:charlist()}
-            | {atom(), RegExp::iodata() | unicode:charlist(), Options::list()}.
+            | {atom(), RegExp::iodata() | unicode:charlist(), Options::re_options()}.
 
 -type binding() :: {atom(), binary() | list(binary() | any())}.
 
 -type match_function() :: fun((binary(), any()) -> boolean() | {ok, any()})
                         | fun((binary()) -> boolean() | {ok, any()}).
+
+% For compat with OTP26, where the re module does not export the options.
+% This can be removed when the minimum supported OTP version is 27.
+-type re_nl_spec() :: cr | crlf | lf | nul | anycrlf | any.
+
+-type re_compile_options() :: [re_compile_option()].
+-type re_compile_option() :: unicode | anchored | caseless | dollar_endonly
+                        | dotall | extended | firstline | multiline
+                        | no_auto_capture | dupnames | ungreedy
+                        | {newline, re_nl_spec()}
+                        | bsr_anycrlf | bsr_unicode
+                        | no_start_optimize | ucp | never_utf.
+
+-type re_options() :: [re_option()].
+-type re_option() :: anchored | global | notbol | noteol | notempty |
+                  notempty_atstart | report_errors |
+                  {offset, non_neg_integer()} |
+                  {match_limit, non_neg_integer()} |
+                  {match_limit_recursion, non_neg_integer()} |
+                  {capture, ValueSpec :: re_capture()} |
+                  {capture, ValueSpec :: re_capture(), Type :: index | list | binary} |
+                  re_compile_option().
+-type re_capture() :: all | all_but_first | all_names | first | none |
+                   ValueList :: [integer() | string() | atom()].
+
 
 -export_type([
     dispatch_rule/0,
@@ -394,23 +419,27 @@ is_simple_pattern(_) -> false.
     PathTokens :: dispatch_rule_path(),
 	Acc :: [ MatchToken ],
     MatchToken :: {Binding, {Mod, Fun}}
+                | {Binding, {Mod, Fun, Args}}
                 | {Binding, RE}
                 | {Binding, RE, re:options()}
                 | Binding
                 | binary(),
     Mod :: module(),
     Fun :: atom(),
+    Args :: list(),
     Binding :: atom(),
 	RE :: {dispatch_re_pattern, term()},
 	Result :: Acc.
 compile_re_path([], Acc) ->
     lists:reverse(Acc);
-compile_re_path([{Token, {Mod, Fun}}|Rest], Acc) ->
+compile_re_path([{Token, {Mod, Fun}}|Rest], Acc) when is_atom(Mod), is_atom(Fun) ->
     compile_re_path(Rest, [{Token, {Mod,Fun}}|Acc]);
-compile_re_path([{Token, RE}|Rest], Acc) ->
+compile_re_path([{Token, {Mod, Fun, Args}}|Rest], Acc) when is_atom(Mod), is_atom(Fun), is_list(Args) ->
+    compile_re_path(Rest, [{Token, {Mod,Fun,Args}}|Acc]);
+compile_re_path([{Token, RE}|Rest], Acc) when is_list(RE); is_binary(RE) ->
     REKey = regexp_compile(RE, []),
     compile_re_path(Rest, [{Token, REKey}|Acc]);
-compile_re_path([{Token, RE, Options}|Rest], Acc) ->
+compile_re_path([{Token, RE, Options}|Rest], Acc) when is_list(RE); is_binary(RE) ->
     {CompileOpt,RunOpt} = lists:partition(fun is_compile_opt/1, Options),
     REKey = regexp_compile(RE, CompileOpt),
     compile_re_path(Rest, [{Token, REKey, RunOpt}|Acc]);
@@ -424,7 +453,7 @@ compile_re_path([Token|Rest], Acc) when is_atom(Token); is_binary(Token) ->
 
 -spec regexp_compile(RE, Options) -> REKey when
     RE :: string() | binary(),
-    Options :: re:compile_options(),
+    Options :: re_compile_options(),
     REKey :: term().
 regexp_compile(RE, CompileOpt) ->
     Key = {RE, CompileOpt},
