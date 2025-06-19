@@ -363,6 +363,7 @@ list_bindings([P|Ps], Nr, Acc) ->
 
 -spec binding_var(Variable) -> Result when
 	Variable :: {Name, any()} | {Name, term(), term()} | term(),
+    Name :: atom() | binary() | integer() | list(),
 	Result :: erl_syntax:syntaxTree().
 binding_var({Name, _}) ->
     erl_syntax:atom(to_atom(Name));
