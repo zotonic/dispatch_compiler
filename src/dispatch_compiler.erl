@@ -417,16 +417,43 @@ compile_re_path([], Acc) ->
 compile_re_path([{Token, {Mod, Fun}}|Rest], Acc) ->
     compile_re_path(Rest, [{Token, {Mod,Fun}}|Acc]);
 compile_re_path([{Token, RE}|Rest], Acc) ->
-    {ok, MP} = re:compile(RE),
-    compile_re_path(Rest, [{Token, MP}|Acc]);
+    REKey = regexp_compile(RE, []),
+    compile_re_path(Rest, [{Token, REKey}|Acc]);
 compile_re_path([{Token, RE, Options}|Rest], Acc) ->
     {CompileOpt,RunOpt} = lists:partition(fun is_compile_opt/1, Options),
-    {ok, MP} = re:compile(RE, CompileOpt),
-    compile_re_path(Rest, [{Token, MP, RunOpt}|Acc]);
+    REKey = regexp_compile(RE, CompileOpt),
+    compile_re_path(Rest, [{Token, REKey, RunOpt}|Acc]);
 compile_re_path([Token|Rest], Acc) when is_list(Token) ->
     compile_re_path(Rest, [unicode:characters_to_binary(Token)|Acc]);
 compile_re_path([Token|Rest], Acc) when is_atom(Token); is_binary(Token) ->
     compile_re_path(Rest, [Token|Acc]).
+
+%% @doc Compile the regexp and store in the persistent_term for quick access.
+%% Doing so allows the regexp to be compiled only once and reused.
+
+-spec regexp_compile(RE, Options) -> {ok, REKey} when
+    RE :: string() | binary(),
+    Options :: re:compile_options(),
+    REKey :: term().
+regexp_compile(RE, CompileOpt) ->
+    Key = {RE, CompileOpt},
+    REKey = {dispatch_re_pattern, Key},
+    case persistent_term:get(REKey, undefined) of
+        undefined ->
+            {ok, MP} = re:compile(RE, CompileOpt),
+            persistent_term:put(REKey, MP),
+            REKey;
+        MP when is_tuple(MP), element(1, MP) =:= re_pattern ->
+            REKey
+    end.
+
+%% @doc Run the regular expression over the path element.
+%% The regular expression is a key into the persistent_term storage, which
+%% is defined when compiling the dispatch rule with the regular expression.
+
+regexp_run(Match, {dispatch_re_pattern, _} = REKey, RunOpt) ->
+    RE = persistent_term:get(REKey),
+    re:run(Match, RE, RunOpt).
 
 %% @doc Only allow options valid for the `re:compile/3' function.
 
@@ -555,12 +582,12 @@ bind([{Token, Fun}|RestToken], [Match|RestMatch], Bindings, Context) when is_fun
         {ok, Value} -> bind(RestToken, RestMatch, [{Token, Value}|Bindings], Context)
     end;
 bind([{Token, RegExp}|RestToken], [Match|RestMatch], Bindings, Context) when is_atom(Token) ->
-    case re:run(Match, RegExp) of
+    case regexp_run(Match, RegExp, []) of
         {match, _} -> bind(RestToken, RestMatch, [{Token, Match}|Bindings], Context);
         nomatch -> fail
     end;
 bind([{Token, RegExp, Options}|RestToken], [Match|RestMatch], Bindings, Context) when is_atom(Token) ->
-    case re:run(Match, RegExp, Options) of
+    case regexp_run(Match, RegExp, Options) of
         {match, []} -> bind(RestToken, RestMatch, [{Token, Match}|Bindings], Context);
         {match, [T|_]} when is_tuple(T) -> bind(RestToken, RestMatch, [{Token, Match}|Bindings], Context);
         {match, [Captured]} -> bind(RestToken, RestMatch, [{Token, Captured}|Bindings], Context);
