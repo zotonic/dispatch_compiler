@@ -3,7 +3,7 @@
   {description, "Compile dispatch rules to an Erlang module"},
   {vsn, "git"},
   {registered, []},
-  {applications, [ kernel, stdlib ]},
+  {applications, [ kernel, stdlib, syntax_tools, compiler ]},
   {env, []},
   {maintainers, ["Zotonic Team"]},
   {licenses, ["Apache 2.0"]},
