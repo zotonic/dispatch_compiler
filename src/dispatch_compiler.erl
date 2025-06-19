@@ -421,7 +421,7 @@ is_simple_pattern(_) -> false.
     MatchToken :: {Binding, {Mod, Fun}}
                 | {Binding, {Mod, Fun, Args}}
                 | {Binding, RE}
-                | {Binding, RE, re:options()}
+                | {Binding, RE, re_options()}
                 | Binding
                 | binary(),
     Mod :: module(),
