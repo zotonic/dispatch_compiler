@@ -1,6 +1,6 @@
 %% @author Marc Worrell <marc@worrell.nl>
 %% @copyright 2015 Marc Worrell
-%% @doc 
+%% @doc
 %% Compile dispatch rules to an Erlang module.
 %%
 %% The dispatch compiler takes all the list of dispatch rules and creates
@@ -39,7 +39,7 @@
 %%      match1(Path, Context).
 %%
 %% match1(..., Context) ->
-%%      ... 
+%%      ...
 %% match1(_, _Context) ->
 %%      fail.
 %% '''
@@ -50,9 +50,9 @@
 %% Licensed under the Apache License, Version 2.0 (the "License");
 %% you may not use this file except in compliance with the License.
 %% You may obtain a copy of the License at
-%% 
+%%
 %%     http://www.apache.org/licenses/LICENSE-2.0
-%% 
+%%
 %% Unless required by applicable law or agreed to in writing, software
 %% distributed under the License is distributed on an "AS IS" BASIS,
 %% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,13 +74,13 @@
 
 -type dispatch_rule_path() :: list(dispatch_rule_token()).
 
--type dispatch_rule_token() :: 
+-type dispatch_rule_token() ::
               binary()
             | '*'
-            | atom() 
+            | atom()
             | {atom(), {atom(), atom()}}
             | {atom(), {atom(), atom(), list()}}
-            | {atom(), match_function()} 
+            | {atom(), match_function()}
             | {atom(), RegExp::iodata() | unicode:charlist()}
             | {atom(), RegExp::iodata() | unicode:charlist(), Options::list()}.
 
@@ -90,9 +90,9 @@
                         | fun((binary()) -> boolean() | {ok, any()}).
 
 -export_type([
-    dispatch_rule/0, 
-    dispatch_rule_path/0, 
-    dispatch_rule_token/0, 
+    dispatch_rule/0,
+    dispatch_rule_path/0,
+    dispatch_rule_token/0,
     match_function/0,
     binding/0
 ]).
@@ -100,7 +100,7 @@
 %% @doc Compile and load Erlang module.
 
 -spec compile_load(ModuleName, DLs) -> Result when
-	ModuleName :: atom(), 
+	ModuleName :: atom(),
 	DLs :: [dispatch_rule()],
 	Result :: ok.
 compile_load(ModuleName, DLs) ->
@@ -129,9 +129,9 @@ compile(ModuleName, DLs) when is_atom(ModuleName), is_list(DLs) ->
 %% @equiv Module:match(Tokens, Context)
 %% @doc Launch `Module' `match' function.
 
--spec match(Module, Tokens, Context) -> Result when 
-	Module :: atom(), 
-	Tokens :: [binary()], 
+-spec match(Module, Tokens, Context) -> Result when
+	Module :: atom(),
+	Tokens :: [binary()],
 	Context :: any(),
 	Result :: {ok, {dispatch_rule(), [binding()]}} | fail.
 match(Module, Tokens, Context) ->
@@ -166,7 +166,7 @@ match_asts(DLs, FunAsts, Nr) ->
 %%      matches left, in that case a chained match function will be added by match_asts/3
 
 -spec match_ast(DLs, Nr) -> Result when
-	DLs :: [dispatch_rule()], 
+	DLs :: [dispatch_rule()],
 	Nr :: non_neg_integer(),
 	Result ::  {ok, DLs, SyntaxTree},
 	SyntaxTree :: erl_syntax:syntaxTree().
@@ -181,8 +181,8 @@ funname(0) -> match;
 funname(N) -> list_to_atom("match"++integer_to_list(N)).
 
 -spec match_clauses(DLs, Nr, Acc) -> Result when
-	DLs :: [] | [dispatch_rule()], 
-	Nr :: non_neg_integer(), 
+	DLs :: [] | [dispatch_rule()],
+	Nr :: non_neg_integer(),
 	Acc :: [erl_syntax:syntaxTree()],
 	Result :: {ok, DLs, [erl_syntax:syntaxTree()]}.
 match_clauses([], _Nr, Acc) ->
@@ -238,7 +238,7 @@ match_clauses([ DispatchRule | DLs ], Nr, Acc) ->
                                             erl_syntax:abstract(DispatchRule),
                                             erl_syntax:variable("Bindings")
                                         ])
-                                    ]) 
+                                    ])
                                 ]),
                             % One of:
                             % * fail -> matchN(Pattern, Context)
@@ -246,7 +246,7 @@ match_clauses([ DispatchRule | DLs ], Nr, Acc) ->
                             erl_syntax:clause(
                                 [ erl_syntax:atom(fail) ],
                                 none,
-                                [ 
+                                [
                                     case IsMatchingOther of
                                         true ->
                                             erl_syntax:application(
@@ -293,7 +293,7 @@ list_pattern(Pattern) ->
     list_pattern(Pattern, 1, []).
 
 -spec list_pattern(Pattern, Nr, Acc) -> Result when
-	Pattern :: [] | ['*'] | [term()],
+	Pattern :: [ '*' | term() ],
 	Nr :: non_neg_integer(),
 	Acc :: [erl_syntax:syntaxTree()],
 	Result :: erl_syntax:syntaxTree().
@@ -334,16 +334,16 @@ list_pattern([_|Ps], Nr, Acc) ->
 %% @equiv list_bindings(Pattern, 1, [])
 
 -spec list_bindings(Pattern) -> Result when
-	Pattern :: [] | ['*'] | [term()],
-	Result :: [erl_syntax:syntaxTree()].
+	Pattern :: [ '*' | term() ],
+	Result :: erl_syntax:syntaxTree().
 list_bindings(Pattern) ->
     list_bindings(Pattern, 1, []).
 
 -spec list_bindings(Pattern, Nr, Acc) -> Result when
-	Pattern :: [] | ['*'] | [term()],
+	Pattern :: [ '*' | term() ],
 	Nr :: integer(),
 	Acc :: [erl_syntax:syntaxTree()],
-	Result :: [erl_syntax:syntaxTree()].
+	Result :: erl_syntax:syntaxTree().
 list_bindings([], _Nr, Acc) ->
     erl_syntax:list(lists:reverse(Acc), none);
 list_bindings([B|Ps], Nr, Acc) when is_binary(B); is_list(B) ->
@@ -374,11 +374,11 @@ binding_var(Name) ->
 
 -spec to_atom(Name) -> Result when
 	Name :: atom() | binary() | integer() | list(),
-	Result :: erl_syntax:syntaxTree().
+	Result :: atom().
 to_atom(Name) when is_atom(Name) -> Name;
-to_atom(Name) when is_binary(Name) -> list_to_atom(binary_to_list(Name)); 
-to_atom(Name) when is_integer(Name) -> list_to_atom(integer_to_list(Name)); 
-to_atom(Name) when is_list(Name) -> list_to_atom(Name). 
+to_atom(Name) when is_binary(Name) -> list_to_atom(binary_to_list(Name));
+to_atom(Name) when is_integer(Name) -> list_to_atom(integer_to_list(Name));
+to_atom(Name) when is_list(Name) -> list_to_atom(Name).
 
 -spec is_simple_pattern(Pattern) -> Result when
 	Pattern :: [] | [term()],
@@ -390,27 +390,18 @@ is_simple_pattern([z_language|_]) -> false;
 is_simple_pattern([V|Ps]) when is_atom(V) -> is_simple_pattern(Ps);
 is_simple_pattern(_) -> false.
 
--spec compile_re_path(TokenList, Acc) -> Result when
-	TokenList :: [{Token, {Mod, Fun}}] | [{Token, RE}] | [{Token, RE, CompileOptions}],
-	Token :: atom(),
-	Mod :: atom(),
-	Fun :: atom(),
-	RE :: iodata() | unicode:charlist(),
-	CompileOptions :: [CompileOption],
-	CompileOption :: unicode | anchored | caseless | dotall | 
-		extended | ungreedy | no_auto_capture | dupnames,
-	Acc :: [{Token, MP}] | [{Token, MP, RunOptions}],
-	MP :: re:mp(),
-	RunOptions :: [RunOption],
-	RunOption :: anchored | global | notbol | noteol | notempty |  
-		notempty_atstart | report_errors | {offset, non_neg_integer()} |
-		{match_limit, non_neg_integer()} | {match_limit_recursion, non_neg_integer()} |
-		{newline, re:nl_spec()} | bsr_anycrlf | bsr_unicode | {capture, ValueSpec} |
-		{capture, ValueSpec, Type} | CompileOption,
-	ValueSpec :: all | all_but_first | all_names | first | none | ValueList,
-	ValueList :: [ValueID],
-	ValueID :: integer() | string() | atom(),
-	Type :: index | list | binary,
+-spec compile_re_path(PathTokens, Acc) -> Result when
+    PathTokens :: dispatch_rule_path(),
+	Acc :: [ MatchToken ],
+    MatchToken :: {Binding, {Mod, Fun}}
+                | {Binding, RE}
+                | {Binding, RE, re:options()}
+                | Binding
+                | binary(),
+    Mod :: module(),
+    Fun :: atom(),
+    Binding :: atom(),
+	RE :: {dispatch_re_pattern, term()},
 	Result :: Acc.
 compile_re_path([], Acc) ->
     lists:reverse(Acc);
@@ -431,7 +422,7 @@ compile_re_path([Token|Rest], Acc) when is_atom(Token); is_binary(Token) ->
 %% @doc Compile the regexp and store in the persistent_term for quick access.
 %% Doing so allows the regexp to be compiled only once and reused.
 
--spec regexp_compile(RE, Options) -> {ok, REKey} when
+-spec regexp_compile(RE, Options) -> REKey when
     RE :: string() | binary(),
     Options :: re:compile_options(),
     REKey :: term().
@@ -458,7 +449,8 @@ regexp_run(Match, {dispatch_re_pattern, _} = REKey, RunOpt) ->
 %% @doc Only allow options valid for the `re:compile/3' function.
 
 -spec is_compile_opt(CompileOption) -> Result when
-	CompileOption :: unicode | anchored | caseless | dotall | extended | ungreedy | no_auto_capture | dupnames,
+	CompileOption :: unicode | anchored | caseless | dotall | extended | ungreedy
+                   | no_auto_capture | dupnames,
 	Result :: boolean().
 is_compile_opt(unicode) -> true;
 is_compile_opt(anchored) -> true;
@@ -477,8 +469,8 @@ var(Nr) ->
     erl_syntax:variable("V"++integer_to_list(Nr)).
 
 -spec is_matching_other(Pattern, DLs) -> Result when
-	Pattern :: [] | ['*']  | [binary()] | [list()] | [term()],	
-	DLs :: [dispatch_rule()], 
+	Pattern :: [] | ['*']  | [binary()] | [list()] | [term()],
+	DLs :: [dispatch_rule()],
 	Result :: boolean().
 is_matching_other(_Pattern, []) ->
     false;
@@ -489,18 +481,18 @@ is_matching_other(Pattern0, [{_Name, Pattern1, _Controller, _Options}|DLs]) ->
     end.
 
 -spec is_match(Pattern1, Pattern2) -> Result when
-	Pattern1 :: [] | ['*']  | [binary()] | [list()] | [term()],	
+	Pattern1 :: [] | ['*']  | [binary()] | [list()] | [term()],
 	Pattern2 :: Pattern1,
 	Result :: boolean().
-is_match([], []) -> 
+is_match([], []) ->
     true;
 is_match(['*'], _) ->
     true;
 is_match(_, ['*']) ->
     true;
-is_match([], _) -> 
+is_match([], _) ->
     false;
-is_match(_, []) -> 
+is_match(_, []) ->
     false;
 is_match([B|Pattern0], [B|Pattern1]) ->
     is_match(Pattern0, Pattern1);
@@ -518,17 +510,17 @@ is_match([_|Pattern0], [_|Pattern1]) ->
 %% @doc Runtime callback for argument binding with checks on the arguments. The checks
 %%      can be a function, module-function, or regexp.
 
--spec runtime_bind(Pattern, Path, Context) -> Result when 
-	Pattern :: list(), 
-	Path :: [binary()], 
+-spec runtime_bind(Pattern, Path, Context) -> Result when
+	Pattern :: list(),
+	Path :: [binary()],
 	Context :: any(),
 	Result :: {ok, [binding()]} | fail.
 runtime_bind(Pattern, Path, Context) ->
     bind(Pattern, Path, [], Context).
 
 -spec bind(Pattern, Path, Bindings, Context) -> Result when
-	Pattern :: [] | ['*'] | [Token| RestToken] | 
-				[{Token, {Module,Function}}|RestToken] | 
+	Pattern :: [] | ['*'] | [Token| RestToken] |
+				[{Token, {Module,Function}}|RestToken] |
 				[{Token, {Module,Function,Args}}|RestToken] |
 				[{Token, Fun}|RestToken] | [{Token, RegExp}|RestToken] | term(),
 	Token :: atom(),
@@ -555,14 +547,14 @@ bind([Token|RestToken], [Token|RestMatch], Bindings, Context) ->
     bind(RestToken, RestMatch, Bindings, Context);
 bind([Token|RestToken], [Match|RestMatch], Bindings, Context) when is_atom(Token) ->
     bind(RestToken, RestMatch, [{Token, Match}|Bindings], Context);
-bind([{Token, {Module,Function}}|RestToken],[Match|RestMatch],Bindings, Context) 
+bind([{Token, {Module,Function}}|RestToken],[Match|RestMatch],Bindings, Context)
   when is_atom(Token), is_atom(Module), is_atom(Function) ->
     case Module:Function(Match, Context) of
         true -> bind(RestToken, RestMatch, [{Token, Match}|Bindings], Context);
         false -> fail;
         {ok, Value} -> bind(RestToken, RestMatch, [{Token, Value}|Bindings], Context)
     end;
-bind([{Token, {Module,Function,Args}}|RestToken],[Match|RestMatch],Bindings, Context) 
+bind([{Token, {Module,Function,Args}}|RestToken],[Match|RestMatch],Bindings, Context)
   when is_atom(Token), is_atom(Module), is_atom(Function), is_list(Args) ->
     case erlang:apply(Module, Function, [Match,Context|Args]) of
         true -> bind(RestToken, RestMatch, [{Token, Match}|Bindings], Context);
